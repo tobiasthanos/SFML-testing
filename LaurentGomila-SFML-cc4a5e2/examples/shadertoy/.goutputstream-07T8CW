@@ -1,0 +1,43 @@
+#ifndef EDITOR_H
+#define EDITOR_H
+
+class Editor
+{
+	public:
+
+	int linenumber;
+	int positioninline;
+	int totallines;
+	int sourceoffset;
+
+	float spacing;
+	float r,g,b;
+	bool visible;
+	float cursor;
+	vector<string> sourcefile;
+	Text displayedlines[41];
+
+	Editor();
+	void initialize();
+	void vis();
+	void passkey(char key);
+	void passback();
+	void passenter();
+	void passdelete();
+	void passdeleteline();
+	void passleft();
+	void passright();
+	void passup();
+	void passdown();
+	void update();
+	void render();
+	void loadfile(char* filetoopen);
+	void savefile(char* filetoopen);
+	unsigned long getFileLength(ifstream& file);
+
+	private:
+
+	float a;                    ///< alpha value used to fade in/out smoothly following visible flag
+};
+
+#endif

@@ -1,0 +1,56 @@
+uniform float times;
+uniform vec2 resolution;
+uniform vec2 mouse;
+
+#define num 10
+
+vec2 points[num];
+float rs[num];
+
+float fakebeat = pow(abs(sin(times*4)),10);
+
+
+float rand(vec2 co){
+    return fract(sin(dot(co.xy ,vec2(12.9898,78.233))) * 43758.5453);
+}
+
+void main(void)
+{
+   vec2 mblob;
+   mblob.x = 2 - mouse.x/resolution.x*4;
+   mblob.y = 2-mouse.y/resolution.y*4;
+
+//note to self: DO NOT CREATE INFINITE LOOPS
+    //screen coordinates
+    vec2 p = (-1.5 + 1.5 * gl_FragCoord.xy*3 / resolution.xy) + mblob;
+   float metaball = 0;
+
+ for(int i = 0; i < num; i++)
+    {
+        points[i].x = cos( ( times ) * 3+i+ 2*i)  ;
+        points[i].y = sin(i * .5 * times  + tan(i^2))  ;
+        rs[i] = (dot(p-points[i],p-points[i]))*20.0  /  fakebeat;
+        metaball += (.01+rand(p) / rs[i]);        
+    }
+
+    //sum the meatballs
+   //float metaball =(1.0/r1+1.0/r2);
+    //alter the cut-off power
+    //float col = pow(metaball,-1);
+    float col = (rand(p*times)*.2)+smoothstep(-metaball*10,80,5) ;
+
+    //set the output color
+    gl_FragColor = vec4(  col , -col*cos(times), -col*sin(times) , 1);
+
+}
+
+
+
+
+
+
+
+
+
+
+

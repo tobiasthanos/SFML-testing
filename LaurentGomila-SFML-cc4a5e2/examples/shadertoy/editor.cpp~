@@ -1,0 +1,237 @@
+#include "editor.h"
+
+	Editor::Editor()
+	{
+
+		spacing = 20;
+		font.loadFromFile("resources/PatinioFuturawide.ttf");
+		visible = true;  
+	}
+
+    void Editor::initialize(string name)
+    {
+    		filename = name;
+        for(int i=0;i<41;i++)
+        {
+            displayedlines[i].setPosition(100,100+(spacing*i));
+            displayedlines[i].setFont(font);
+            displayedlines[i].setCharacterSize(16);
+            displayedlines[i].setScale(1.6,1.6);
+            displayedlines[i].setColor(sf::Color(0,0,0));
+        }
+        
+	linenumber = 0;
+	positioninline = 0;
+	totallines = 0;
+	sourceoffset = 0;
+	
+	sourcefile.erase(sourcefile.begin(),sourcefile.end());
+	
+	cursor.setSize(sf::Vector2f(3,22));
+	cursor.setFillColor(sf::Color(0,0,0));
+	cursor.setPosition( ( displayedlines[linenumber].findCharacterPos(positioninline) - sf::Vector2f(2,-12) ) );
+	
+	loadfile((char*)filename.c_str());
+    }
+    
+	void Editor::vis()
+	{
+		visible = !visible;
+	}
+	
+	void Editor::setColor(sf::Color col)
+	{
+		cursor.setFillColor(col);
+		for(int i=0;i<41;i++)
+        	{
+          	displayedlines[i].setColor(col);
+        	}
+	}
+           
+    void Editor::passkey(char key)
+    {
+    		sourcefile[linenumber+sourceoffset].insert ( positioninline, 1, key );
+    		positioninline++;
+    }
+    
+	void Editor::passback()
+	{
+		if(positioninline > 0)
+		{
+			sourcefile[linenumber+sourceoffset].erase ( positioninline-1, 1 );
+			positioninline--;
+		
+		}
+	}
+
+	void Editor::passenter()
+	{
+		vector<string>::iterator it = sourcefile.begin();
+		it += linenumber+sourceoffset;
+		sourcefile.insert(it+1, "");
+		if(linenumber < 40)
+		{
+			linenumber++;
+		}
+		else
+		{
+			sourceoffset++;
+		}
+		
+		positioninline = 0;
+	}
+	
+	void Editor::passdelete()
+	{
+		sourcefile[linenumber+sourceoffset].erase ( positioninline, 1 );
+	}
+	
+	void Editor::passdeleteline()
+	{
+		vector<string>::iterator it = sourcefile.begin();
+		it += linenumber+sourceoffset;
+		sourcefile.erase(it);
+		linenumber--;
+		if(linenumber > sourcefile.size()-1)
+		{
+			sourceoffset--;
+		}
+		positioninline = 0;
+	}
+	
+	void Editor::passleft()
+	{
+		if(positioninline > 0)
+		{
+			positioninline--;
+		}
+	}
+	
+	void Editor::passright()
+	{
+		if(positioninline < displayedlines[linenumber].getString().getSize())
+		{
+			positioninline++;
+		}
+	}
+	
+	void Editor::passup()
+	{
+		if(linenumber > 0)
+		{
+			linenumber--;
+			if(positioninline > displayedlines[linenumber].getString().getSize())
+			{
+				positioninline = displayedlines[linenumber].getString().getSize();
+			}
+		}
+		else
+		{
+			if( sourceoffset > 0 )
+			{
+				sourceoffset--;
+			}
+		}
+	}
+	
+	void Editor::passdown()
+	{
+	
+		if( linenumber + sourceoffset < sourcefile.size()-1 )
+		{
+			if(linenumber < 40)
+			{
+				linenumber++;
+				if(positioninline > displayedlines[linenumber].getString().getSize())
+				{
+					positioninline = displayedlines[linenumber].getString().getSize();
+				}
+			}
+		
+			else
+			{
+				
+				linenumber = 40;
+				if(sourceoffset < sourcefile.size()-41)
+				{
+					sourceoffset++;
+				}
+			}
+		}
+	}
+	
+	unsigned long Editor::getFileLength(ifstream& file)
+	{
+	    if(!file.good()) return 0;
+	    
+	    unsigned long pos=file.tellg();
+	    file.seekg(0,ios::end);
+	    unsigned long len = file.tellg();
+	    file.seekg(ios::beg);
+	    
+	    return len;
+	}
+
+	void Editor::loadfile(string filetoopen)
+	{
+		unsigned long len = 0;
+		unsigned long vlen = 0;
+
+		ifstream file;
+		file.open(filetoopen.c_str(), ios::in); // opens as ASCII!
+
+		vlen = getFileLength(file);
+
+		char tmp[1000];
+		unsigned int i=0;
+		while (file.good())
+		{
+			file.getline( tmp, 1000 );       // get line from file.
+			sourcefile.push_back(tmp);
+			if (!file.eof())
+			{
+				i++;
+				totallines = i;
+			}
+	
+		}
+
+		file.close();
+		
+		for(int i = 0; i < 41 && i < sourcefile.size(); i++)
+		{
+			displayedlines[i].setString(/* its(i ) +*/ sourcefile[i+sourceoffset] );
+		}
+	}
+
+	void Editor::savefile(string filetoopen)
+	{
+		ofstream file;
+		file.open(filetoopen.c_str(), ios::out); // opens as ASCII!
+
+		for(int i = 0; i < sourcefile.size(); i++)
+		{
+			file.write(sourcefile[i].c_str(),sourcefile[i].size());
+			file << "\n";
+		}
+		file.close();
+	}
+
+    void Editor::update()
+    {
+    
+        for (unsigned int i=0; i<41; i++)
+           {
+           	if ( i + sourceoffset < sourcefile.size() )
+           	{
+           		displayedlines[i].setString( /*its(i + sourceoffset + 1) +*/ sourcefile[i+sourceoffset] );
+           	}
+           	else
+           	{
+           		displayedlines[i].setString( "" );
+           	}	
+           }
+	cursor.setPosition( ( displayedlines[linenumber].findCharacterPos(positioninline) - sf::Vector2f(2,-6) ) );
+    }
+
+   

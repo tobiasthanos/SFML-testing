@@ -1,0 +1,19 @@
+-- the first program in every language
+--clr()
+
+--a = 12 * 2
+--bgp(a)
+--bgp("Hello World!")
+--f=Foo()
+--f:foo()
+
+circ=Circle()
+--c:addCircle()
+--c:setPosition(300,300)
+--c:display()
+
+
+
+
+
+

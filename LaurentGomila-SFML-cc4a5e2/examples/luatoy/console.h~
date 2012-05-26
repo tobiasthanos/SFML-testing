@@ -1,0 +1,46 @@
+#ifndef CONSOLE_H
+#define CONSOLE_H
+
+class Console
+{
+	public:
+
+    float x1,y1,x2,y2;
+    float border;
+    float spacing;
+    float r,g,b;
+    float opacity;
+    bool visible;
+	int TIN;
+    sf::text consoleitem[50];
+    string entry;
+	vector<string> args;
+    Console();
+    void initialize(float x1, float y1, float x2, float y2);
+    void print( const string temp);
+	void vis();
+    void passkey(char key);
+    void passback();
+    void passenter();
+	void historyup();
+	void historydown();
+	void update();
+	void render();
+	
+	private:
+       
+	std::string commandline;
+
+	// actual line index (in history)
+	int lineIndex;
+
+	// buffers size
+	int commandBufferSize;
+	int textBufferSize;
+
+	std::vector<std::string> commandBuffer;
+
+	float a;                    ///< alpha value used to fade in/out smoothly following visible flag
+};
+
+#endif

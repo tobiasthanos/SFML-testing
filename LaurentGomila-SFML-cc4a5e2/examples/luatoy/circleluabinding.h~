@@ -1,0 +1,109 @@
+luabind::module(app.luastate)
+[
+
+	luabind::class_<sf::CircleShape>("CircleShape") 
+	.def(luabind::constructor<float radius&, unsigned int points&>()) 
+	.def("setPosition", (void(sf::CircleShape::*)(float x, float y)) &sf::CircleShape::setPosition )
+
+/*
+
+void 	setRadius (float radius)
+ 	Set the radius of the circle. 
+ 	
+float 	getRadius () const
+ 	Get the radius of the circle. 
+ 	
+void 	setPointCount (unsigned int count)
+ 	Set the number of points of the circle. 
+ 	
+virtual unsigned int 	getPointCount () const
+ 	Get the number of points of the shape. 
+ 	
+virtual Vector2f 	getPoint (unsigned int index) const
+ 	Get a point of the shape. 
+ 	
+void 	setTexture (const Texture *texture, bool resetRect=false)
+ 	Change the source texture of the shape. 
+ 	
+void 	setTextureRect (const IntRect &rect)
+ 	Set the sub-rectangle of the texture that the shape will display. 
+ 	
+void 	setFillColor (const Color &color)
+ 	Set the fill color of the shape. 
+ 	
+void 	setOutlineColor (const Color &color)
+ 	Set the outline color of the shape. 
+ 	
+void 	setOutlineThickness (float thickness)
+ 	Set the thickness of the shape's outline. 
+ 	
+const Texture * 	getTexture () const
+ 	Get the source texture of the shape. 
+ 	
+const IntRect & 	getTextureRect () const
+ 	Get the sub-rectangle of the texture displayed by the shape. 
+ 	
+const Color & 	getFillColor () const
+ 	Get the fill color of the shape. 
+ 	
+const Color & 	getOutlineColor () const
+ 	Get the outline color of the shape. 
+ 	
+float 	getOutlineThickness () const
+ 	Get the outline thickness of the shape. 
+ 	
+FloatRect 	getLocalBounds () const
+ 	Get the local bounding rectangle of the entity. 
+ 	
+FloatRect 	getGlobalBounds () const
+ 	Get the global bounding rectangle of the entity. 
+ 	
+void 	setPosition (float x, float y)
+ 	set the position of the object 
+ 	
+void 	setPosition (const Vector2f &position)
+ 	set the position of the object 
+ 	
+void 	setRotation (float angle)
+ 	set the orientation of the object 
+ 	
+void 	setScale (float factorX, float factorY)
+ 	set the scale factors of the object 
+ 	
+void 	setScale (const Vector2f &factors)
+ 	set the scale factors of the object 
+ 	
+void 	setOrigin (float x, float y)
+ 	set the local origin of the object 
+ 	
+void 	setOrigin (const Vector2f &origin)
+ 	set the local origin of the object 
+ 	
+const Vector2f & 	getPosition () const
+ 	get the position of the object 
+ 	
+float 	getRotation () const
+ 	get the orientation of the object 
+ 	
+const Vector2f & 	getScale () const
+ 	get the current scale of the object 
+ 	
+const Vector2f & 	getOrigin () const
+ 	get the local origin of the object 
+ 	
+void 	move (float offsetX, float offsetY)
+ 	Move the object by a given offset. 
+ 	
+void 	move (const Vector2f &offset)
+ 	Move the object by a given offset. 
+ 	
+void 	rotate (float angle)
+ 	Rotate the object. 
+ 	
+void 	scale (float factorX, float factorY)
+ 	Scale the object. 
+ 	
+void 	scale (const Vector2f &factor)
+ 	Scale the object. 
+ 	*/
+];

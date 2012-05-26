@@ -1,0 +1,238 @@
+#include "editor.h"
+
+	Editor::Editor()
+    {
+
+        spacing = 18;
+
+        r = 0.0f;
+        g = 0.0f;
+        b = 0.0f;
+        visible = true;  
+    }
+
+    void Editor::initialize()
+    {
+        for(int i=0;i<41;i++)
+        {
+            displayedlines[i].x=100;
+            displayedlines[i].y=winheight-(spacing*i)-(spacing*10);
+         //   displayedlines[i].text=its(i);
+        }
+        
+	linenumber = 0;
+	positioninline = 0;
+	totallines = 0;
+	sourceoffset = 0;
+	loadfile((char *)"frag.frag");
+    }
+    
+	void Editor::vis()
+	{
+		visible = !visible;
+	}
+           
+    void Editor::passkey(char key)
+    {
+    		sourcefile[linenumber+sourceoffset].insert ( positioninline, 1, key );
+    		positioninline++;
+    }
+    
+	void Editor::passback()
+	{
+		if(positioninline > 0)
+		{
+			sourcefile[linenumber+sourceoffset].erase ( positioninline-1, 1 );
+			positioninline--;
+		
+		}
+	}
+
+	void Editor::passenter()
+	{
+		vector<string>::iterator it = sourcefile.begin();
+		it += linenumber+sourceoffset;
+		sourcefile.insert(it+1, "");
+		linenumber++;
+	}
+	
+	void Editor::passdelete()
+	{
+		sourcefile[linenumber+sourceoffset].erase ( positioninline, 1 );
+	}
+	
+	void Editor::passdeleteline()
+	{
+		vector<string>::iterator it = sourcefile.begin();
+		it += linenumber+sourceoffset;
+		sourcefile.erase(it);
+		if ( linenumber > sourcefile.size()-1 )
+		{
+			linenumber = sourcefile.size()-2;
+		}
+	}
+	
+	void Editor::passleft()
+	{
+		if(positioninline > 0)
+		{
+			positioninline--;
+		}
+	}
+	
+	void Editor::passright()
+	{
+		if(positioninline < displayedlines[linenumber].text.length())
+		{
+			positioninline++;
+		}
+	}
+	
+	void Editor::passup()
+	{
+		if(linenumber > 0)
+		{
+			linenumber--;
+			if(positioninline > displayedlines[linenumber].text.length())
+			{
+				positioninline = displayedlines[linenumber].text.length();
+			}
+		}
+		else
+		{
+			if( sourceoffset > 0 )
+			{
+				sourceoffset--;
+			}
+		}
+	}
+	
+	void Editor::passdown()
+	{
+	
+		if( linenumber - sourceoffset < sourcefile.size()-1 )
+		{
+			if(linenumber < 40)
+			{
+				linenumber++;
+				if(positioninline > displayedlines[linenumber].text.length())
+				{
+					positioninline = displayedlines[linenumber].text.length();
+				}
+			}
+		
+			else
+			{
+				
+				linenumber = 40;
+				if(sourceoffset < sourcefile.size()-41)
+				{
+					sourceoffset++;
+				}
+			}
+		}
+	}
+	
+	unsigned long Editor::getFileLength(ifstream& file)
+	{
+	    if(!file.good()) return 0;
+	    
+	    unsigned long pos=file.tellg();
+	    file.seekg(0,ios::end);
+	    unsigned long len = file.tellg();
+	    file.seekg(ios::beg);
+	    
+	    return len;
+	}
+
+	void Editor::loadfile(char *filetoopen)
+	{
+		unsigned long len = 0;
+		unsigned long vlen = 0;
+
+		ifstream file;
+		file.open(filetoopen, ios::in); // opens as ASCII!
+
+		vlen = getFileLength(file);
+
+		char tmp[1000];
+		unsigned int i=0;
+		while (file.good())
+		{
+			file.getline( tmp, 1000 );       // get line from file.
+			sourcefile.push_back(tmp);
+			if (!file.eof())
+			{
+				i++;
+				totallines = i;
+			}
+	
+		}
+
+		file.close();
+		
+		for(int i = 0; i < 41 && i < sourcefile.size(); i++)
+		{
+			displayedlines[i].text = /*its(i ) +*/ sourcefile[i+sourceoffset];
+		}
+	}
+
+	void Editor::savefile(char *filetoopen)
+	{
+		ofstream file;
+		file.open(filetoopen, ios::out); // opens as ASCII!
+
+		for(int i = 0; i < sourcefile.size(); i++)
+		{
+			file.write(sourcefile[i].c_str(),sourcefile[i].size());
+			file << "\n";
+		}
+
+		file.close();
+	}
+
+    void Editor::update()
+    {
+    
+        for (unsigned int i=0; i<41 && i < sourcefile.size(); i++)
+           {
+           	displayedlines[i].text = /*its(i + sourceoffset + 1) +*/ sourcefile[i+sourceoffset];
+                displayedlines[i].update();
+           }
+           
+           cursor = 0.3 + sin(times * 10);
+    }
+
+    void Editor::render()
+    {
+        
+
+        // render screen darkening quad
+shad.enable();
+        glBegin(GL_QUADS);
+        glColor3f(1,1,1);
+        glVertex2f(0,0);
+        glVertex2f(0,(float)winheight);
+        glVertex2f((float)winwidth,(float)winheight);
+        glVertex2f((float)winwidth,0);
+        glEnd();
+
+		
+		if (visible == false)
+            return;
+            
+		shad.disable();
+		//inv.enable();
+        // render text
+        for (unsigned int i=0; i<41; i++)
+		{
+			displayedlines[i].render();
+		}
+		if ( cursor > 0 )
+		{
+			glPrint(95 + (positioninline * 12),winheight-(spacing*linenumber)-(spacing*10),(string) "|");
+		}
+		
+       	//inv.disable();
+       	//shad.enable();
+    }

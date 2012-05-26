@@ -1,0 +1,46 @@
+uniform float times;
+uniform vec2 resolution;
+
+#define num 10
+
+vec2 points[num];
+float rs[num];
+
+float rand(vec2 co){
+    return fract(sin(dot(co.xy ,vec2(12.9898,78.233))) * 43758.5453);
+}
+
+void main(void)
+{
+//note to self: DO NOT CREATE INFINITE LOOPS
+    //screen coordinates
+    vec2 p = -1.5 + 3.0 * gl_FragCoord.xy / resolution.xy;
+   float metaball = 0;
+
+ for(int i = 0; i < num; i++)
+    {
+        points[i].x = cos( ( times ) * 3+i+ 2*i)  ;
+        points[i].y = sin(i * .5 * times  + tan(i^2))  ;
+        rs[i] = (dot(p-points[i],p-points[i]))*40.0;
+        metaball += (.01+rand(p) / rs[i]);        
+    }
+
+    //sum the meatballs
+   //float metaball =(1.0/r1+1.0/r2);
+    //alter the cut-off power
+    //float col = pow(metaball,-1);
+    float col = (rand(p*times)*.2)+smoothstep(-metaball*10,80,5) ;
+
+    //set the output color
+    gl_FragColor = vec4(  col , -col*cos(times), -col*sin(times) , 1);
+
+}
+
+
+
+
+
+
+
+
+

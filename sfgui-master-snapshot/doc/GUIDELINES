@@ -1,0 +1,114 @@
+                             SFGUI code guidelines
+                            Last change: 2011-08-23
+
+1. INTRODUCTION
+
+This file gives information about some code guidelines for the SFGUI project.
+The main reason is to keep the code style and behaviour of the whole library as
+consistent as possible.
+
+
+2. COMMITS/CONTRIBUTIONS TO THE REPOSITORY
+
+We're very thankful for every patch, commit or contribution for SFGUI. The
+upstream repository at GitHub got frequented in the past, because whole
+histories of contributor's commits were applied to master.
+
+So here are some rules to follow so that your commits are applied:
+
+- Before sending in a pull request, rebase your work to the current master's
+  HEAD. You can do this by invoking "git pull --rebase origin master" (make
+  sure you're locally in your master branch). Another possible way is "git
+  fetch origin", then "git rebase origin/master".
+
+- Squash your commits before requesting a pull! That means combine all your
+  single commits of your contribution into bigger commits (preferably one big
+  commit, but this depends on the changes).
+
+- Just to make it clear: Try to avoid the merge workflow.
+
+Here's an example of a typical session:
+
+- Checkout a separate branch:
+
+    git checkout -b cool_feature
+
+- Program and do some commits.
+
+- Now someone has pushed new commits to upstream's master. Because you want
+  those new changes to be in your cool_feature branch too, REBASE your commits on
+  top of them:
+  
+    git pull --rebase origin master
+  
+  (this may require you to solve some merge conflicts; be sure to read Git's
+  output!!!).
+
+- Program and do some commits, again. Done with the new feature, now it's time
+  to prepare it for a pull request.
+
+- At first make sure all your commits are really applied ON TOP OF HEAD of
+  origin's master:
+  
+    git pull --rebase origin master
+
+- Checkout master and merge the branch:
+
+    git checkout master
+    git merge cool_feature
+
+- Squash away unnecessary commits by combining them:
+
+    git rebase -i origin/master
+
+- Send pull request.
+
+
+3. CODE STYLE
+
+Check the sources of SFGUI to see how code is formatted. Formatting code is
+like a religion for programmers, but please stick to SFGUI's style if you're
+about to contribute source code.
+
+
+4. GENERAL RULES
+
+  1. No definitions in class declarations: Do not define something within a
+     class declaration. That includes methods: Even if they're short, do not
+     auto-inline by defining it.
+
+     NO:
+     class Foo {
+       void Bar() { ... }
+     };
+
+     YES:
+     class Foo {
+       void Bar();
+     };
+
+  2. Pay attention at const-correct method signatures. Getters mostly return
+     const references — an exception are built-in C++ types like int, char etc.
+
+     NO:
+     sf::String GetText();
+
+     YES:
+     const sf::String& GetText() const;
+
+  3. Use clear and full names, especially for method names.
+
+     NO:
+     void SetPos();
+
+     YES:
+     void SetPosition();
+
+  4. Always use new-style casts. Avoid reinterpret_cast and const_cast whenever
+     possible.
+
+     NO:
+     float foo = (float)4;
+
+     YES:
+     float foo = static_cast<float>( 4 );

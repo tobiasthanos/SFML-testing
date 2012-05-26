@@ -1,0 +1,106 @@
+#include <SFML/Graphics.hpp>
+
+// Always include the necessary header files.
+// Including SFGUI/SFGUI.hpp includes everything
+// you can possibly need automatically.
+#include <SFGUI/SFGUI.hpp>
+
+int main() {
+	// Create the main SFML window
+	sf::RenderWindow app_window( sf::VideoMode( 800, 600 ), "SFGUI Notebook Example", sf::Style::Titlebar | sf::Style::Close );
+
+	// We have to do this because we don't use SFML to draw.
+	app_window.resetGLStates();
+
+	// Create an SFGUI. This is required before doing anything with SFGUI.
+	sfg::SFGUI sfgui;
+
+	// Create our main SFGUI window
+	sfg::Window::Ptr window;
+	window = sfg::Window::Create();
+	window->SetTitle( "Title" );
+
+	// Create our notebook smart pointer.
+	sfg::Notebook::Ptr notebook;
+
+	// Create the notebook itself.
+	notebook = sfg::Notebook::Create();
+
+	// Create a couple of buttons to populate the notebook.
+	sfg::Button::Ptr button1( sfg::Button::Create("Hello") );
+	sfg::Button::Ptr button2( sfg::Button::Create("World") );
+	
+	sfg::Box::Ptr scroll1;
+	
+	scroll1 = sfg::Box::Create( sfg::Box::VERTICAL );
+	
+	sfg::Entry::Ptr ent ;
+
+	for( int i = 0; i < 5; i++ ) {
+		sfg::Box::Ptr box = sfg::Box::Create( sfg::Box::HORIZONTAL );
+
+		for( int j = 0; j < 5; j++ ) 
+		{
+			ent = sfg::Entry::Create( "One text among many \n test" );
+			ent->SetRequisition( sf::Vector2f( 50.f, .0f ) );
+			box->Pack( ent ,false );
+		}
+
+		scroll1->Pack( box, false );
+	}
+
+
+	// Add new pages to the notebook with respective tab labels
+	// containing solely the buttons as their children.
+	notebook->AppendPage( button1, sfg::Label::Create( "Page 1" ) );
+	notebook->AppendPage( button2, sfg::Label::Create( "Page 2" ) );
+	notebook->AppendPage( scroll1, sfg::Label::Create( "Page 3" ) );
+	notebook->AppendPage( sfg::Label::Create(), sfg::Label::Create( "Page 4" ) );
+	notebook->AppendPage( sfg::Label::Create(), sfg::Label::Create( "Page 5" ) );
+	notebook->AppendPage( sfg::Label::Create(), sfg::Label::Create( "Page 6" ) );
+	notebook->AppendPage( sfg::Label::Create(), sfg::Label::Create( "Page 7" ) );
+	notebook->AppendPage( sfg::Label::Create(), sfg::Label::Create( "Page 8" ) );
+
+	notebook->SetScrollable( true );
+	notebook->SetRequisition( sf::Vector2f( 200.f, 0.f ) );
+
+	// Add the notebook to the window.
+	window->Add( notebook );
+
+	sf::Clock clock;
+
+	// Start the game loop
+	while ( app_window.isOpen() ) {
+		// Process events
+		sf::Event event;
+
+		while ( app_window.pollEvent( event ) ) {
+			// Handle events
+			window->HandleEvent( event );
+
+			// Close window : exit
+			if ( event.type == sf::Event::Closed ) {
+				app_window.close();
+			}
+		}
+
+		// Update the GUI every 5ms
+		if( clock.getElapsedTime().asMicroseconds() >= 5000 ) {
+			// Update() takes the elapsed time in seconds.
+			window->Update( static_cast<float>( clock.getElapsedTime().asMicroseconds() ) / 1000000.f );
+
+			clock.restart();
+		}
+
+		// Clear screen
+		app_window.clear();
+
+		// Draw the GUI
+		sfgui.Display( app_window );
+
+		// Update the window
+		app_window.display();
+	}
+
+	return EXIT_SUCCESS;
+}

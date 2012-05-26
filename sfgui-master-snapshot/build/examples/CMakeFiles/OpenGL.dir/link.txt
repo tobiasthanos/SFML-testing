@@ -1,0 +1,1 @@
+/usr/bin/c++   -Wall -Wextra -Wshadow -Wconversion -Wno-long-long -pedantic -O3 -DNDEBUG    CMakeFiles/OpenGL.dir/OpenGL.cpp.o  -o OpenGL -rdynamic ../lib/libsfgui.so /usr/local/lib/libsfml-graphics.so /usr/local/lib/libsfml-window.so /usr/local/lib/libsfml-system.so -lGLU -lGL -Wl,-rpath,/home/tobias/sfml/sfgui-master-snapshot/build/lib:/usr/local/lib: 

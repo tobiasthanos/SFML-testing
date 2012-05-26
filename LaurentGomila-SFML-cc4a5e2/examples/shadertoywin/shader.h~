@@ -1,0 +1,219 @@
+struct ShaderParam
+{
+	ShaderParam(string n, float * x)
+	{
+		name = n;
+		params[0] = x;
+		size = 1;
+	} 
+	ShaderParam(string n, float * x,float * y)
+	{
+		name = n;
+		params[0] = x;
+		params[1] = y;
+		size = 2;
+	}
+	string name;
+	int size;
+	float * params[4];
+};
+
+
+
+class Shader
+{
+	public:
+
+	GLchar * fragsource;
+	GLchar * vertsource;
+	string vertfile;
+	string fragfile;
+	int flen;
+	int vlen;
+	
+	vector<ShaderParam> params;
+
+	GLuint vertshader, fragshader;
+
+	GLuint shaderprogram;
+
+	void printlog()
+	{
+	    int infologLength = 0;
+	    int charsWritten  = 0;
+	    char *infoLog;
+
+		glGetProgramiv(shaderprogram, GL_INFO_LOG_LENGTH,&infologLength);
+
+	    if (infologLength > 0)
+	    {
+		   infoLog = (char *)malloc(infologLength);
+		   glGetProgramInfoLog(shaderprogram, infologLength, &charsWritten, infoLog);
+		   free(infoLog);
+	    }
+	}
+	
+	void update()
+	{
+		load(vertfile,fragfile);
+		printlog();
+	}
+
+	void load(string vertname,string fragname)
+	{
+		vertfile = vertname;
+		fragfile = fragname;
+		loadvert();
+		loadfrag();
+		//compile
+		glDeleteShader(vertshader);
+		glDeleteShader(fragshader);
+		vertshader = glCreateShader(GL_VERTEX_SHADER);
+		fragshader = glCreateShader(GL_FRAGMENT_SHADER);
+
+		glShaderSource(vertshader, 1, (const GLchar **) &vertsource, &vlen);
+		glShaderSource(fragshader, 1, (const GLchar **) &fragsource, &flen);
+
+		glCompileShader(vertshader);
+		printlog();
+		glCompileShader(fragshader);
+		printlog();
+
+		//link
+		glDeleteProgram(shaderprogram);
+		shaderprogram = glCreateProgram();
+
+		glAttachShader(shaderprogram, vertshader);
+		glAttachShader(shaderprogram, fragshader);
+
+		glLinkProgram(shaderprogram);
+
+	}
+
+	unsigned long getFileLength(ifstream& file)
+	{
+	    if(!file.good()) return 0;
+	    
+	    unsigned long pos=file.tellg();
+	    file.seekg(0,ios::end);
+	    unsigned long len = file.tellg();
+	    file.seekg(ios::beg);
+	    
+	    return len;
+	}
+
+	void loadvert()
+	{
+		unsigned long len = 0;
+
+	   ifstream file;
+	   file.open(vertfile.c_str(), ios::in); // opens as ASCII!
+	    
+	   vlen = getFileLength(file);
+	   vertsource = (GLchar*) new char[vlen+1];
+	   
+	    // len isn't always strlen cause some characters are stripped in ascii read...
+	    // it is important to 0-terminate the real length later, len is just max possible value... 
+	   vertsource[vlen] = 0; 
+
+	   unsigned int i=0;
+	   while (file.good())
+	   {
+		  vertsource[i] = file.get();       // get character from file.
+		  if (!file.eof())
+		   i++;
+	   }
+	    
+	   vertsource[i] = 0;  // 0-terminate it at the correct position
+	   file.close();
+	}
+	
+
+	void loadfrag()
+	{
+		unsigned long len = 0;
+
+	   ifstream file;
+	   file.open(fragfile.c_str(), ios::in); // opens as ASCII!
+	    
+	   flen = getFileLength(file);
+	   
+	   fragsource = (GLchar*) new char[flen+1];
+	   
+	    // len isn't always strlen cause some characters are stripped in ascii read...
+	    // it is important to 0-terminate the real length later, len is just max possible value... 
+	   fragsource[flen] = 0; 
+
+	   unsigned int i=0;
+	   while (file.good())
+	   {
+		  fragsource[i] = file.get();       // get character from file.
+		  if (!file.eof())
+		   i++;
+	   }
+	    
+	   fragsource[i] = 0;  // 0-terminate it at the correct position
+	   file.close();
+	}
+	
+	void setparams(string name , float * x)
+	{
+		params.push_back(ShaderParam(name,x));
+	}
+	
+	void setparams(string name , float * x , float * y)
+	{
+		params.push_back(ShaderParam(name,x,y));
+	}
+	
+	void updateparams()
+	{
+		if(shaderprogram)
+		{
+			glUseProgram(shaderprogram);
+			for( vector<ShaderParam>::iterator it = params.begin(); it != params.end(); it++)
+			{
+				GLint location = glGetUniformLocation(shaderprogram, it->name.c_str());
+				if(location > 0)
+				{
+					switch(it->size)
+					{
+						case 1:
+							glUniform1f(location,*it->params[0]);
+						break;
+						case 2:
+							glUniform2f(location,*it->params[0],*it->params[1]);
+						break;
+						case 3:
+							glUniform3f(location,*it->params[0],*it->params[1],*it->params[2]);
+						break;
+						case 4:
+							glUniform4f(location,*it->params[0],*it->params[1],*it->params[2],*it->params[3]);
+						break;
+					}
+				}
+				else
+				{
+					//printf("parameter %s not found",it->name.c_str());
+				}
+			}
+			
+		}
+		else
+		{
+			printf("shader doesn't exist yet, load one before you try and set it's parameters.");
+		}
+		glUseProgram(0);
+	}
+
+	void enable()
+	{
+		glUseProgram(shaderprogram);
+	}
+
+	void disable()
+	{
+		glUseProgram(0);
+	}
+
+};

@@ -1,0 +1,29 @@
+#ifndef CAMERA_H
+#define CAMERA_H
+
+class Layer;
+
+class Camera : public sf::Drawable
+{
+	public:
+	Camera();
+	
+	sf::Vector2f Position;
+	sf::Vector2f Scale;
+	float Rotation;
+	
+	Layer layers[3];
+	
+	void set();
+	void unset();
+	void Move(sf::Vector2f dpos);
+	void Rotate(float drot);
+	void dScale(sf::Vector2f dscale);
+	void setPosition(sf::Vector2f pos);
+	void setRotation(float rot);
+	void setScale(sf::Vector2f scale);
+	virtual void Render(sf::RenderTarget& target, sf::RenderStates states) const;
+	
+};
+
+#endif

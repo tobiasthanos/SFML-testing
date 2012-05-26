@@ -1,0 +1,9 @@
+#include "layer.h"
+
+	void Layer::draw(sf::RenderTarget& target)
+	{
+		for(vector<sf::Sprite>::iterator it = drawables.begin();it<drawables.end();it++)
+		{
+			window.draw(*it);
+		}
+	}

@@ -1,0 +1,34 @@
+#IncludeRegexLine: ^[ 	]*#[ 	]*(include|import)[ 	]*[<"]([^">]+)([">])
+
+#IncludeRegexScan: ^.*$
+
+#IncludeRegexComplain: ^$
+
+#IncludeRegexTransform: 
+
+../extlibs/GLee/include/GLee.h
+windows.h
+-
+GL/gl.h
+-
+OpenGL/gl.h
+-
+GL/gl.h
+-
+GL/glx.h
+-
+stddef.h
+-
+
+/home/tobias/sfml/sfgui-master-snapshot/extlibs/GLee/src/GLee.c
+stdio.h
+-
+stdlib.h
+-
+string.h
+-
+GLee.h
+/home/tobias/sfml/sfgui-master-snapshot/extlibs/GLee/src/GLee.h
+Carbon/Carbon.h
+-
+
